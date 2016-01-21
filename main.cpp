@@ -85,8 +85,8 @@ double bruteForce(vector<Point> input) {
 		}
 	}
 	//cout << "closest pair distance: " << minDistance << endl; 
-	sort(minPoints.begin(), minPoints.end());
-	minPoints.erase( unique( minPoints.begin(), minPoints.end() ), minPoints.end() );
+	//sort(minPoints.begin(), minPoints.end());
+	//minPoints.erase( unique( minPoints.begin(), minPoints.end() ), minPoints.end() );
 	//for(vector<Point>::iterator j = minPoints.begin(); j != minPoints.end(); ++j) {
 	//	cout << "(" << j->x << ", " << j->y << ") ";
 	//}
