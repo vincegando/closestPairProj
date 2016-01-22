@@ -5,6 +5,7 @@
 #include <cfloat>
 #include <stdlib.h>
 #include <math.h>
+#include <cmath>
 
 using namespace std;
 
@@ -42,9 +43,41 @@ struct Point
 
 };
 
+struct sort_by_y
+{
+    inline bool operator() (const Point first, const Point second)
+    {
+        if(first.y < second.y) {
+        	return true;
+        }
+        else if(first.y == second.y) {
+        	if(first.x < second.x) {
+        		return true;
+        	}
+        	else {
+        		return false;
+        	}
+        }
+        else {
+        	return false;
+        }
+    }
+};
+
+vector<Point> minPoints;
+
 double dist(Point a, Point b)
 {
     return (sqrt((a.x-b.x)*(a.x-b.x) + (a.y-b.y)*(a.y-b.y)));
+}
+
+double returnMinimum(double x, double y) {
+	if (x <= y) {
+		return x;
+	}
+	else {
+		return y;
+	}
 }
 
 bool isDuplicate(vector<Point> input, Point p) {
@@ -59,7 +92,7 @@ bool isDuplicate(vector<Point> input, Point p) {
 double bruteForce(vector<Point> input) {
 	
 	double minDistance = DBL_MAX;
-	vector<Point> minPoints;
+	//vector<Point> minPoints;
 	if (input.size() < 2) {
 		//error
 		return 0;
@@ -95,13 +128,21 @@ double bruteForce(vector<Point> input) {
 
 }
 
-double stripFunction(vector<Point> input, int size, double d) {
+double stripFunction(vector<Point> input, double d) {
 	double minDistance = d;
+	sort(input.begin(), input.end(), sort_by_y());
 
-	return 0;
+	for(int i = 0;i < input.size(); ++i) {
+		for(int j = i + 2; j < input.size() && (input[j].y - input[i].y) < minDistance; ++j) {
+			if(dist(input[i], input[j]) < minDistance)
+				minDistance = dist(input[i], input[j]);
+		}
+	}
+
+	return minDistance;
 }
 
-double basicHelper(vector<Point> input, int size) {
+double basic(vector<Point> input) {
 
 	if (input.size() <= 3) {
 		return bruteForce(input);
@@ -109,25 +150,26 @@ double basicHelper(vector<Point> input, int size) {
 
 	int half = input.size() / 2;
 	Point mid = input[half];
+	vector<Point> firstHalf = vector<Point>(input.begin(), input.begin() + half);
+	vector<Point> secondHalf = vector<Point>(input.begin() + half + 1, input.end());
+	
+	double left = basic(firstHalf);
+	double right = basic(secondHalf);
 
-	double left = basicHelper(input, half);
-	//double right = basicHelper(input + half, size - half);
-
-	//double d = min(left, right);
+	double d = returnMinimum(left, right);
 
 	vector<Point> stripOfPoints;
-	int i = 0;
-	for (int j = 0; j <size; j++) {
-		//if (abs(input[j].x - mid.x) < d) {
-		//	stripOfPoints[i] = input[j];
-		//	i++;
-		//}
+	for (int i = 0; i < input.size(); i++) {
+		if (abs(input[i].x - mid.x) < d) {
+			stripOfPoints.push_back(input[i]);
+		}
 	}
 
-	return 0;//min(d, stripFunction(stripOfPoints, i, d));
+	return returnMinimum(d, stripFunction(stripOfPoints, d));
 
 
 }
+
 
 void optimalMethod(vector<Point> input) {
 
@@ -198,10 +240,23 @@ int main(int argc, char *argv[]) {
 	if (type == "brute"){
 		double closestBruteDistance = bruteForce(p);
 		cout << "closest pair distance: " << closestBruteDistance << endl;
-		//NEED TO PRINT OUT POINTS
+		sort(minPoints.begin(), minPoints.end());
+		minPoints.erase( unique( minPoints.begin(), minPoints.end() ), minPoints.end() );
+		for(vector<Point>::iterator j = minPoints.begin(); j != minPoints.end(); j = j +2) {
+			cout << "(" << j->x << ", " << j->y << ") " << "(" << (j+1)->x << ", " << (j+1)->y << ")" << endl;
+		}
+		//NEED TO PRINT OUT POINTS, DOESNT WORK WHEN ONE POINT IS REPEATED
 	}
 	else if(type == "basic") {
 		cout << "basic" << endl;
+		sort(p.begin(), p.end());
+		double basicDistance = basic(p);
+		cout << "closest pair distance: " << basicDistance << endl;
+		// sort(minPoints.begin(), minPoints.end());
+		// minPoints.erase( unique( minPoints.begin(), minPoints.end() ), minPoints.end() );
+		// for(vector<Point>::iterator j = minPoints.begin(); j != minPoints.end(); j = j +2) {
+		// 	cout << "(" << j->x << ", " << j->y << ") " << "(" << (j+1)->x << ", " << (j+1)->y << ")" << endl;
+		// }
 	}
 	else if(type == "optimal") {
 		cout << "optimal" << endl;
