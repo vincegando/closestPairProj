@@ -134,7 +134,20 @@ double stripFunction(vector<Point> input, double d) {
 	sort(input.begin(), input.end(), sort_by_y());
 
 	for(int i = 0;i < input.size(); ++i) {
-		for(int j = i + 2; j < input.size() && (input[j].y - input[i].y) < minDistance; ++j) {
+		for(int j = i + 1; j < input.size() && (input[j].y - input[i].y) < minDistance; ++j) {
+			if(dist(input[i], input[j]) < minDistance)
+				minDistance = dist(input[i], input[j]);
+		}
+	}
+
+	return minDistance;
+}
+
+double stripFunctionOptimal(vector<Point> input, double d) {
+	double minDistance = d;
+
+	for(int i = 0;i < input.size(); ++i) {
+		for(int j = i + 1; j < input.size() && (input[j].y - input[i].y) < minDistance; ++j) {
 			if(dist(input[i], input[j]) < minDistance)
 				minDistance = dist(input[i], input[j]);
 		}
@@ -152,7 +165,7 @@ double basic(vector<Point> input) {
 	int half = input.size() / 2;
 	Point mid = input[half];
 	vector<Point> firstHalf = vector<Point>(input.begin(), input.begin() + half);
-	vector<Point> secondHalf = vector<Point>(input.begin() + half + 1, input.end());
+	vector<Point> secondHalf = vector<Point>(input.begin() + half, input.end());
 	
 	double left = basic(firstHalf);
 	double right = basic(secondHalf);
@@ -172,8 +185,55 @@ double basic(vector<Point> input) {
 }
 
 
-void optimalMethod(vector<Point> input) {
+double optimalHelper(vector<Point> x, vector<Point> y) {
 
+	if (y.size() <= 3) {
+		return bruteForce(x);
+	}
+
+	int half = y.size() / 2;
+	Point middle = x[half];
+
+	vector<Point> leftSide;
+	vector<Point> rightSide;
+	for (int i = 0;i < y.size(); i++) {
+		if (y[i].x <= middle.x) {
+			leftSide.push_back(y[i]);
+		}
+		else {
+			rightSide.push_back(y[i]);
+		}
+	}
+	vector<Point> temp = vector<Point>(x.begin() + half, x.end());
+	double left = optimalHelper(x, leftSide);
+	double right = optimalHelper(temp,rightSide);
+
+	double d = returnMinimum(left, right);
+
+	vector<Point> stripOfPoints;
+	for (int h = 0; h < y.size(); h++) {
+		if (abs(y[h].x - middle.x) < d) {
+			stripOfPoints.push_back(y[h]);
+		}
+	}
+
+	return returnMinimum(d, stripFunctionOptimal(stripOfPoints, d));
+}
+
+double optimal(vector<Point> input) {
+
+	vector<Point> xPoints;
+	vector<Point> yPoints;
+
+	for(int j = 0; j < input.size(); j++) {
+		xPoints.push_back(input[j]);
+		yPoints.push_back(input[j]);
+	}
+
+	sort(xPoints.begin(), xPoints.end());
+	sort(yPoints.begin(), yPoints.end(), sort_by_y());
+
+	return optimalHelper(xPoints, yPoints);
 }
 
 
@@ -249,7 +309,6 @@ int main(int argc, char *argv[]) {
 		//NEED TO PRINT OUT POINTS, DOESNT WORK WHEN ONE POINT IS REPEATED
 	}
 	else if(type == "basic") {
-		cout << "basic" << endl;
 		sort(p.begin(), p.end());
 		double basicDistance = basic(p);
 		cout << "closest pair distance: " << basicDistance << endl;
@@ -261,6 +320,8 @@ int main(int argc, char *argv[]) {
 	}
 	else if(type == "optimal") {
 		cout << "optimal" << endl;
+		double optimalDistance = optimal(p);
+		cout << "closest pair distance: " << optimalDistance << endl;
 	}
 	else {
 		cout << "Error. Invalid input" << endl;
