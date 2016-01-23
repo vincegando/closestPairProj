@@ -40,8 +40,12 @@ double dist(Point a, Point b)
     return (sqrt((a.x-b.x)*(a.x-b.x) + (a.y-b.y)*(a.y-b.y)));
 }
 
-double returnMinimum(double x, double y) {
-	if (x <= y) {
+double pairDist(Pair p) {
+	return (sqrt((p.first.x-p.second.x)*(p.first.x-p.second.x) + (p.first.y-p.second.y)*(p.first.y-p.second.y)));
+}
+
+vector<Pair> returnMinimum(vector<Pair> x, vector<Pair> y) {
+	if (pairDist(x[0]) <= pairDist(y[0])) {
 		return x;
 	}
 	else {
@@ -114,15 +118,72 @@ double bruteForce(vector<Point> input) {
 
 }
 
-double stripFunction(vector<Point> input, double d) {
-	double minDistance = d;
-	sort(input.begin(), input.end(), sort_by_y());
+vector<Pair> bruteForce2(vector<Point> input) {
+	
+	double minDistance = DBL_MAX;
+	vector<Pair> minPoints2;
+	if (input.size() < 2) {
+		//error
+		vector<Pair> tempVec;
+		return tempVec;
+	} 
+	else {
+		for(long int itr = 0; itr < input.size(); ++itr) {
 
+			for(long int i = itr + 1; i < input.size(); ++i) {
+				if (dist(input[itr], input[i]) < minDistance) {
+					minDistance = dist(input[itr],input[i]);
+					minPoints2.clear();
+					Point newPoint1;
+					newPoint1.x = input[itr].x;
+					newPoint1.y = input[itr].y;
+					Point newPoint2;
+					newPoint2.x = input[i].x;
+					newPoint2.y = input[i].y;	
+					Pair newPair;
+					newPair.first = newPoint1;
+					newPair.second = newPoint2;
+					minPoints2.push_back(newPair);
+				}
+				else if (dist(input[itr],input[i]) == minDistance) {
+					Point newPoint1;
+					newPoint1.x = input[itr].x;
+					newPoint1.y = input[itr].y;
+					Point newPoint2;
+					newPoint2.x = input[i].x;
+					newPoint2.y = input[i].y;	
+					Pair newPair;
+					newPair.first = newPoint1;
+					newPair.second = newPoint2;
+					minPoints2.push_back(newPair);
+
+				}
+
+				//cout << "Distance: " << dist(*itr,*i) << endl;
+			}
+	
+		}
+	}
+	//cout << "closest pair distance: " << minDistance << endl; 
+	//sort(minPoints.begin(), minPoints.end());
+	//minPoints.erase( unique( minPoints.begin(), minPoints.end() ), minPoints.end() );
+	//for(vector<Point>::iterator j = minPoints.begin(); j != minPoints.end(); ++j) {
+	//	cout << "(" << j->x << ", " << j->y << ") ";
+	//}
+	//cout << "\n"; //NEED TO PRINT OUT TWO POINTS PER LINE, NEED TO PRINT CORRECTLY
+	return minPoints2;
+
+}
+
+vector<Pair> stripFunction(vector<Point> input, vector<Pair> d) {
+	double minDistance = pairDist(d[0]);
+	sort(input.begin(), input.end(), sort_by_y());
+	vector<Pair> result;
 	for(long int i = 0;i < input.size(); ++i) {
 		for(long int j = i + 1; j < input.size() && (input[j].y - input[i].y) < minDistance; ++j) {
 			if(dist(input[i], input[j]) < minDistance) {
 				minDistance = dist(input[i], input[j]);
-				minPoints.clear();
+				result.clear();
 				Point newPoint1;
 				newPoint1.x = input[i].x;
 				newPoint1.y = input[i].y;
@@ -132,7 +193,7 @@ double stripFunction(vector<Point> input, double d) {
 				Pair newPair;
 				newPair.first = newPoint1;
 				newPair.second = newPoint2;
-				minPoints.push_back(newPair);
+				result.push_back(newPair);
 			}
 			else if(dist(input[i], input[j]) == minDistance) {
 				Point newPoint1;
@@ -144,13 +205,13 @@ double stripFunction(vector<Point> input, double d) {
 				Pair newPair;
 				newPair.first = newPoint1;
 				newPair.second = newPoint2;
-				minPoints.push_back(newPair);
+				result.push_back(newPair);
 
 			}
 		}
 	}
 
-	return minDistance;
+	return result;
 }
 
 double stripFunctionOptimal(vector<Point> input, double d) {
@@ -167,10 +228,10 @@ double stripFunctionOptimal(vector<Point> input, double d) {
 	return minDistance;
 }
 
-double basic(vector<Point> input) {
+vector<Pair> basic(vector<Point> input) {
 
 	if (input.size() <= 3) {
-		return bruteForce(input);
+		return bruteForce2(input);
 	}
 
 	int half = input.size() / 2;
@@ -178,30 +239,26 @@ double basic(vector<Point> input) {
 	vector<Point> firstHalf = vector<Point>(input.begin(), input.begin() + half);
 	vector<Point> secondHalf = vector<Point>(input.begin() + half, input.end());
 	
-	double left = basic(firstHalf);
-	double right = basic(secondHalf);
+	vector<Pair> left = basic(firstHalf);
+	vector<Pair> right = basic(secondHalf);
 
-	double d = returnMinimum(left, right);
+	vector<Pair> d = returnMinimum(left, right);
 
 	vector<Point> stripOfPoints;
 	for (int i = 0; i < input.size(); i++) {
-		if (abs(input[i].x - mid.x) < d) {
+		if (abs(input[i].x - mid.x) < pairDist(d[0])) {
 			stripOfPoints.push_back(input[i]);
 		}
 	}
 
-	int minValue = returnMinimum(d, stripFunction(stripOfPoints, d))
-	if (minValue == d) {
-		minPoints.clear();
-		for(int )
-	}
+	
 
-	return minValue;
+	return returnMinimum(d, stripFunction(stripOfPoints, d));
 
 
 }
 
-
+/*
 double optimalHelper(vector<Point> x, vector<Point> y) {
 
 	if (y.size() <= 3) {
@@ -237,6 +294,7 @@ double optimalHelper(vector<Point> x, vector<Point> y) {
 	return returnMinimum(d, stripFunctionOptimal(stripOfPoints, d));
 }
 
+
 double optimal(vector<Point> input) {
 
 	vector<Point> xPoints;
@@ -252,7 +310,7 @@ double optimal(vector<Point> input) {
 
 	return optimalHelper(xPoints, yPoints);
 }
-
+*/
 
 int main(int argc, char *argv[]) {
 
@@ -338,27 +396,28 @@ int main(int argc, char *argv[]) {
 	}
 	else if(type == "basic") {
 		sort(p.begin(), p.end());
-		double basicDistance = basic(p);
-		cout << "closest pair distance: " << basicDistance << endl;
-		for(long int i = 0; i < minPoints.size(); i++){
-			if(minPoints[i].first < minPoints[i].second){
+		vector<Pair> basicVector = basic(p);
+		int finalBasicDistance = dist(basicVector[0].first, basicVector[0].second);
+		cout << "closest pair distance: " << finalBasicDistance << endl;
+		for(long int i = 0; i < basicVector.size(); i++){
+			if(basicVector[i].first < basicVector[i].second){
 				continue;
 			} else {
-				Point temp = minPoints[i].second;
-				minPoints[i].second = minPoints[i].first;
-				minPoints[i].first = temp;
+				Point temp = basicVector[i].second;
+				basicVector[i].second = basicVector[i].first;
+				basicVector[i].first = temp;
 			}
 		}
-		sort(minPoints.begin(), minPoints.end());
-		minPoints.erase( unique( minPoints.begin(), minPoints.end() ), minPoints.end() );
-		for(int j = 0; j < minPoints.size(); j++) {
-			minPoints[j].printPairs();
+		sort(basicVector.begin(), basicVector.end());
+		basicVector.erase( unique( basicVector.begin(), basicVector.end() ), basicVector.end() );
+		for(int j = 0; j < basicVector.size(); j++) {
+			basicVector[j].printPairs();
 		}
 	
 	}
 	else if(type == "optimal") {
-		double optimalDistance = optimal(p);
-		cout << "closest pair distance: " << optimalDistance << endl;
+		//double optimalDistance = optimal(p);
+		//cout << "closest pair distance: " << optimalDistance << endl;
 	}
 	else {
 		cout << "Error. Invalid input" << endl;
