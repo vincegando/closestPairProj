@@ -264,8 +264,38 @@ vector<Pair> basic(vector<Point> input) {
 
 }
 
+vector<Pair> optimal(vector<Point> input) {
+
+	if (input.size() <= 3) {
+		return bruteForce2(input);
+	}
+
+	double half = input.size() / 2;
+	Point mid = input[half];
+	vector<Point> firstHalf = vector<Point>(input.begin(), input.begin() + half);
+	vector<Point> secondHalf = vector<Point>(input.begin() + half, input.end());
+	
+	vector<Pair> left = basic(firstHalf);
+	vector<Pair> right = basic(secondHalf);
+
+	vector<Pair> d = returnMinimum(left, right);
+
+	vector<Point> stripOfPoints;
+	for (int i = 0; i < input.size(); i++) {
+		if (abs(input[i].x - mid.x) < pairDist(d[0])) {
+			stripOfPoints.push_back(input[i]);
+		}
+	}
+
+	
+
+	return returnMinimum(d, stripFunction(stripOfPoints, d));
+
+
+}
+
 /*
-double optimalHelper(vector<Point> x, vector<Point> y) {
+double optimalHelper(vec0000001tor<Point> x, vector<Point> y) {
 
 	if (y.size() <= 3) {
 		return bruteForce(x);
@@ -381,7 +411,7 @@ int main(int argc, char *argv[]) {
 	}
 	if (type == "brute"){
 		double closestBruteDistance = bruteForce(p);
-		cout << "closest pair distance: " << closestBruteDistance << endl;
+		printf("closest pair distance: %lf\n", closestBruteDistance);
 
 		for(long int i = 0; i < minPoints.size(); i++){
 			if(minPoints[i].first < minPoints[i].second){
@@ -403,8 +433,8 @@ int main(int argc, char *argv[]) {
 	else if(type == "basic") {
 		sort(p.begin(), p.end());
 		vector<Pair> basicVector = basic(p);
-		int finalBasicDistance = dist(basicVector[0].first, basicVector[0].second);
-		cout << "closest pair distance: " << finalBasicDistance << endl;
+		double finalBasicDistance = dist(basicVector[0].first, basicVector[0].second);
+		printf("closest pair distance: %lf\n", finalBasicDistance);
 		for(long int i = 0; i < basicVector.size(); i++){
 			if(basicVector[i].first < basicVector[i].second){
 				continue;
@@ -422,8 +452,24 @@ int main(int argc, char *argv[]) {
 	
 	}
 	else if(type == "optimal") {
-		//double optimalDistance = optimal(p);
-		//cout << "closest pair distance: " << optimalDistance << endl;
+		sort(p.begin(), p.end());
+		vector<Pair> optimalVector = optimal(p);
+		double finalOptimalDistance = dist(optimalVector[0].first, optimalVector[0].second);
+		printf("closest pair distance: %lf\n", finalOptimalDistance);
+		for(long int i = 0; i < optimalVector.size(); i++){
+			if(optimalVector[i].first < optimalVector[i].second){
+				continue;
+			} else {
+				Point temp = optimalVector[i].second;
+				optimalVector[i].second = optimalVector[i].first;
+				optimalVector[i].first = temp;
+			}
+		}
+		sort(optimalVector.begin(), optimalVector.end());
+		optimalVector.erase( unique( optimalVector.begin(), optimalVector.end() ), optimalVector.end() );
+		for(int j = 0; j < optimalVector.size(); j++) {
+			optimalVector[j].printPairs();
+		}
 	}
 	else {
 		cout << "Error. Invalid input" << endl;
