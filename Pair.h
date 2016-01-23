@@ -68,21 +68,30 @@ public:
         }
 
     }
+    bool operator== (const Pair& p) const {
+        if (first == p.first && second == p.second) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
 
     // ascending x
     // if 
-    Pair sortPair(Pair p){
-        Pair out;
-        if(p.first < p.second) {
-            return p;
-        } else { 
-            Pair newPair;
-            Point temp = p.first;
-            newPair.first = p.second;
-            newPair.second = temp;
-            return newPair;
-        }
-    }
+    // Pair sortPair(Pair p){
+    //     Pair out;
+    //     if(p.first < p.second) {
+    //         return p;
+    //     } else { 
+    //         Pair newPair;
+    //         Point temp = p.first;
+    //         newPair.first = p.second;
+    //         newPair.second = temp;
+    //         return newPair;
+    //     }
+    // }
 };
 
 #endif

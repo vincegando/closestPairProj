@@ -118,17 +118,34 @@ double stripFunction(vector<Point> input, double d) {
 	double minDistance = d;
 	sort(input.begin(), input.end(), sort_by_y());
 
-	for(int i = 0;i < input.size(); ++i) {
-		for(int j = i + 1; j < input.size() && (input[j].y - input[i].y) < minDistance; ++j) {
+	for(long int i = 0;i < input.size(); ++i) {
+		for(long int j = i + 1; j < input.size() && (input[j].y - input[i].y) < minDistance; ++j) {
 			if(dist(input[i], input[j]) < minDistance) {
 				minDistance = dist(input[i], input[j]);
 				minPoints.clear();
-				//minPoints.push_back(input[i]);
-				//minPoints.push_back(input[j]);
+				Point newPoint1;
+				newPoint1.x = input[i].x;
+				newPoint1.y = input[i].y;
+				Point newPoint2;
+				newPoint2.x = input[j].x;
+				newPoint2.y = input[j].y;
+				Pair newPair;
+				newPair.first = newPoint1;
+				newPair.second = newPoint2;
+				minPoints.push_back(newPair);
 			}
 			else if(dist(input[i], input[j]) == minDistance) {
-				//minPoints.push_back(input[i]);
-				//minPoints.push_back(input[j]);
+				Point newPoint1;
+				newPoint1.x = input[i].x;
+				newPoint1.y = input[i].y;
+				Point newPoint2;
+				newPoint2.x = input[j].x;
+				newPoint2.y = input[j].y;	
+				Pair newPair;
+				newPair.first = newPoint1;
+				newPair.second = newPoint2;
+				minPoints.push_back(newPair);
+
 			}
 		}
 	}
@@ -173,7 +190,13 @@ double basic(vector<Point> input) {
 		}
 	}
 
-	return returnMinimum(d, stripFunction(stripOfPoints, d));
+	int minValue = returnMinimum(d, stripFunction(stripOfPoints, d))
+	if (minValue == d) {
+		minPoints.clear();
+		for(int )
+	}
+
+	return minValue;
 
 
 }
@@ -295,6 +318,17 @@ int main(int argc, char *argv[]) {
 	if (type == "brute"){
 		double closestBruteDistance = bruteForce(p);
 		cout << "closest pair distance: " << closestBruteDistance << endl;
+
+		for(long int i = 0; i < minPoints.size(); i++){
+			if(minPoints[i].first < minPoints[i].second){
+				continue;
+			} else {
+				Point temp = minPoints[i].second;
+				minPoints[i].second = minPoints[i].first;
+				minPoints[i].first = temp;
+			}
+		}
+
 		sort(minPoints.begin(), minPoints.end());
 		minPoints.erase( unique( minPoints.begin(), minPoints.end() ), minPoints.end() );
 		for(int j = 0; j < minPoints.size(); j++) {
@@ -306,11 +340,21 @@ int main(int argc, char *argv[]) {
 		sort(p.begin(), p.end());
 		double basicDistance = basic(p);
 		cout << "closest pair distance: " << basicDistance << endl;
+		for(long int i = 0; i < minPoints.size(); i++){
+			if(minPoints[i].first < minPoints[i].second){
+				continue;
+			} else {
+				Point temp = minPoints[i].second;
+				minPoints[i].second = minPoints[i].first;
+				minPoints[i].first = temp;
+			}
+		}
 		sort(minPoints.begin(), minPoints.end());
 		minPoints.erase( unique( minPoints.begin(), minPoints.end() ), minPoints.end() );
-	// 	for(vector<Pair>::iterator j = minPoints.begin(); j != minPoints.end(); j = j +2) {
-	// 		cout << "(" << j->x << ", " << j->y << ") " << "(" << (j+1)->x << ", " << (j+1)->y << ")" << endl;
-	// 	}
+		for(int j = 0; j < minPoints.size(); j++) {
+			minPoints[j].printPairs();
+		}
+	
 	}
 	else if(type == "optimal") {
 		double optimalDistance = optimal(p);
