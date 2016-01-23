@@ -45,6 +45,12 @@ double pairDist(Pair p) {
 }
 
 vector<Pair> returnMinimum(vector<Pair> x, vector<Pair> y) {
+	if(x.size() == 0)
+		return y;
+
+	if(y.size() == 0)
+		return x;
+
 	if (pairDist(x[0]) <= pairDist(y[0])) {
 		return x;
 	}
@@ -145,7 +151,7 @@ vector<Pair> bruteForce2(vector<Point> input) {
 					newPair.second = newPoint2;
 					minPoints2.push_back(newPair);
 				}
-				else if (dist(input[itr],input[i]) == minDistance) {
+				else if (fabs(dist(input[itr],input[i]) - minDistance) < .0000001) {
 					Point newPoint1;
 					newPoint1.x = input[itr].x;
 					newPoint1.y = input[itr].y;
@@ -234,7 +240,7 @@ vector<Pair> basic(vector<Point> input) {
 		return bruteForce2(input);
 	}
 
-	int half = input.size() / 2;
+	double half = input.size() / 2;
 	Point mid = input[half];
 	vector<Point> firstHalf = vector<Point>(input.begin(), input.begin() + half);
 	vector<Point> secondHalf = vector<Point>(input.begin() + half, input.end());
